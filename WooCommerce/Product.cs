@@ -840,7 +840,8 @@ namespace WooCommerceNET.WooCommerce
         /// <summary>
         /// Stock management at variation level. Default is false.
         /// </summary>
-        [DataMember(EmitDefaultValue = false)]
+        [DataMember(EmitDefaultValue = false, Name = "manage_stock")]
+        private object manage_stockValue { get; set; }
         public bool? manage_stock { get; set; }
 
         /// <summary>
