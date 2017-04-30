@@ -296,6 +296,12 @@ namespace WooCommerceNET.WooCommerce
             return await API.SendHttpClientRequest("products/" + productid.ToString(), RequestMethod.DELETE, string.Empty, parms);
         }
 
+        public async Task<List<Variation>> GetProductVariations(int productId, Dictionary<string, string> parms = null)
+        {
+            string json = await API.SendHttpClientRequest($"products/{productId.ToString()}/variations", RequestMethod.GET, string.Empty, parms);
+            return API.DeserializeJSon<List<Variation>>(json);
+        }
+
         #endregion
 
         #region "Product reviews..."
