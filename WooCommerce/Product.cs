@@ -876,13 +876,6 @@ namespace WooCommerceNET.WooCommerce
         public bool? backordered { get; set; }
 
         /// <summary>
-        /// Shows if the variation can be bought 
-        /// read-only
-        /// </summary>
-        [DataMember(EmitDefaultValue = false)]
-        public bool? purchaseable { get; set; }
-
-        /// <summary>
         /// Variation weight in decimal format.
         /// </summary>
         [DataMember(EmitDefaultValue = false, Name = "weight")]
