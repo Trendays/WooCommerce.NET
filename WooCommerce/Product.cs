@@ -404,6 +404,12 @@ namespace WooCommerceNET.WooCommerce
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public int? menu_order { get; set; }
+
+        /// <summary>
+        /// Meta data
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public List<MetaData> meta_data { get; set; }
     }
 
     [DataContract]
@@ -594,6 +600,28 @@ namespace WooCommerceNET.WooCommerce
     }
 
     [DataContract]
+    public class MetaData
+    {
+        /// <summary>
+        /// Meta ID
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public int? id { get; set; }
+
+        /// <summary>
+        /// Meta key
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public string key { get; set; }
+
+        /// <summary>
+        /// Meta value
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public string value { get; set; }
+    }
+
+    [DataContract]
     public class Download
     {
         /// <summary>
@@ -639,6 +667,12 @@ namespace WooCommerceNET.WooCommerce
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public DateTime? date_modified { get; set; }
+
+        /// <summary>
+        /// Variation description
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public string description { get; set; }
 
         /// <summary>
         /// Variation URL. 
@@ -695,6 +729,12 @@ namespace WooCommerceNET.WooCommerce
         public bool? on_sale { get; set; }
 
         /// <summary>
+        /// Define if the attribute is visible on the “Additional information” tab in the product’s page. Default is true.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public bool? visible { get; set; }
+
+        /// <summary>
         /// Shows if the variation can be bought. 
         /// read-only
         /// </summary>
@@ -704,7 +744,7 @@ namespace WooCommerceNET.WooCommerce
         /// <summary>
         /// If the variation is virtual. Virtual variations are intangible and aren’t shipped. Default is false.
         /// </summary>
-        [DataMember(Name ="virtual", EmitDefaultValue = false)]
+        [DataMember(Name = "virtual", EmitDefaultValue = false)]
         public bool? _virtual { get; set; }
 
         /// <summary>
@@ -815,16 +855,28 @@ namespace WooCommerceNET.WooCommerce
         public int? shipping_class_id { get; set; }
 
         /// <summary>
-        /// Variation featured image. Only position 0 will be used. See Images properties.
+        /// Variation image data. See variation - Images properties.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public List<Image> image { get; set; }
+        public Image image { get; set; }
 
         /// <summary>
         /// List of variation attributes. See Variation Attributes properties
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public List<VariationAttribute> attributes { get; set; }
+
+        /// <summary>
+        /// Menu order, used to custom sort products
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public int? menu_order { get; set; }
+
+        /// <summary>
+        /// Meta data. See Product variation - Meta data properties
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public List<MetaData> meta_data { get; set; }
     }
 
     [DataContract]
@@ -913,6 +965,12 @@ namespace WooCommerceNET.WooCommerce
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public string slug { get; set; }
+
+        /// <summary>
+        /// HTML description of the resource
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public string description { get; set; }
 
         /// <summary>
         /// Menu order, used to custom sort the resource.
