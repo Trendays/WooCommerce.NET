@@ -45,11 +45,23 @@ namespace WooCommerceNET.WooCommerce
         public DateTime? date_created { get; set; }
 
         /// <summary>
+        /// The date the product was created, as GMT
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public DateTime? date_created_gmt { get; set; }
+
+        /// <summary>
         /// The date the product was last modified, in the site’s timezone. 
         /// read-only
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public DateTime? date_modified { get; set; }
+
+        /// <summary>
+        /// The date the product was last modified, as GMT
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public DateTime? date_modified_gmt { get; set; }
 
         /// <summary>
         /// Product type. Default is simple. Options (plugins may add new options): simple, grouped, external, variable.
@@ -125,10 +137,22 @@ namespace WooCommerceNET.WooCommerce
         public string date_on_sale_from { get; set; }
 
         /// <summary>
+        /// Start date of sale price, as GMT
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public string date_on_sale_from_gmt { get; set; }
+
+        /// <summary>
         /// Sets the sale end date. Date in the YYYY-MM-DD format.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public string date_on_sale_to { get; set; }
+
+        /// <summary>
+        /// End date of sale price, in the site’s timezone
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public string date_on_sale_to_gmt { get; set; }
 
         /// <summary>
         /// Price formatted in HTML, e.g. delspan class=\"woocommerce-Price-amount amount\"span class=\"woocommerce-Price-currencySymbol\"#36;nbsp;3.00/span/span/del insspan class=\"woocommerce-Price-amount amount\"span class=\"woocommerce-Price-currencySymbol\"#36;nbsp;2.00/span/span/ins 
@@ -189,12 +213,6 @@ namespace WooCommerceNET.WooCommerce
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public int? download_expiry { get; set; }
-
-        /// <summary>
-        /// Download type, this controls the schema on the front-end. Default is standard. Options: 'standard' (Standard Product), application (Application/Software) and music (Music).
-        /// </summary>
-        [DataMember(EmitDefaultValue = false)]
-        public string download_type { get; set; }
 
         /// <summary>
         /// Product external URL. Only for external products.
@@ -387,10 +405,10 @@ namespace WooCommerceNET.WooCommerce
         public List<DefaultAttribute> default_attributes { get; set; }
 
         /// <summary>
-        /// List of variations. See Variations properties
+        /// List of variations IDs.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public List<Variation> variations { get; set; }
+        public List<int> variations { get; set; }
 
         /// <summary>
         /// List of grouped products ID, only for group type products. 
@@ -502,11 +520,23 @@ namespace WooCommerceNET.WooCommerce
         public DateTime? date_created { get; set; }
 
         /// <summary>
+        /// The date the image was created, as GMT.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public DateTime? date_created_gmt { get; set; }
+
+        /// <summary>
         /// The date the image was last modified, in the site’s timezone. 
         /// read-only
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public DateTime? date_modified { get; set; }
+
+        /// <summary>
+        /// The date the image was last modified, as GMT.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public DateTime? date_modified_gmt { get; set; }
 
         /// <summary>
         /// Image URL. In write-mode used to upload new images.
@@ -662,11 +692,23 @@ namespace WooCommerceNET.WooCommerce
         public DateTime? date_created { get; set; }
 
         /// <summary>
+        /// The date the variation was created, as GMT.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public DateTime? date_created_gmt { get; set; }
+
+        /// <summary>
         /// The date the variation was last modified, in the site’s timezone. 
         /// read-only
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public DateTime? date_modified { get; set; }
+
+        /// <summary>
+        /// The date the variation was last modified, as GMT.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public DateTime? date_modified_gmt { get; set; }
 
         /// <summary>
         /// Variation description
@@ -713,13 +755,25 @@ namespace WooCommerceNET.WooCommerce
         /// Start date of sale price. Date in the YYYY-MM-DD format.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public string date_on_sale_from { get; set; }
+        public DateTime? date_on_sale_from { get; set; }
+
+        /// <summary>
+        /// Start date of sale price, as GMT.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public DateTime? date_on_sale_from_gmt { get; set; }
 
         /// <summary>
         /// Start date of sale price. Date in the YYYY-MM-DD format.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public string date_on_sale_to { get; set; }
+        public DateTime? date_on_sale_to { get; set; }
+
+        /// <summary>
+        /// End date of sale price, as GMT.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public DateTime? date_on_sale_to_gmt { get; set; }
 
         /// <summary>
         /// Shows if the variation is on sale. 
