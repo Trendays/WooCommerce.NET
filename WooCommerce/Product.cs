@@ -842,7 +842,13 @@ namespace WooCommerceNET.WooCommerce
         /// </summary>
         [DataMember(EmitDefaultValue = false, Name = "manage_stock")]
         private object manage_stockValue { get; set; }
-        public bool? manage_stock { get; set; }
+        public bool? manage_stock
+        {
+            get
+            {
+                return manage_stockValue is string ? null : (bool?)manage_stockValue;
+            }
+        }
 
         /// <summary>
         /// Stock quantity. If is a variable variation this value will be used to control stock for all variations, unless you define stock at variation level.
