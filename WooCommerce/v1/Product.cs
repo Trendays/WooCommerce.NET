@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using WooCommerceNET.Base;
 
-namespace WooCommerceNET.WooCommerce
+namespace WooCommerceNET.WooCommerce.v1
 {
     [KnownType(typeof(ProductBatch))]
     public class ProductBatch : BatchObject<Product> { }
@@ -110,7 +110,7 @@ namespace WooCommerceNET.WooCommerce
         /// read-only
         /// </summary>
         [DataMember(EmitDefaultValue = false, Name = "price")]
-        private object priceValue { get; set; }
+        protected object priceValue { get; set; }
 
         public decimal? price { get; set; }
 
@@ -118,7 +118,7 @@ namespace WooCommerceNET.WooCommerce
         /// Product regular price.
         /// </summary>
         [DataMember(EmitDefaultValue = false, Name = "regular_price")]
-        private object regular_priceValue { get; set; }
+        protected object regular_priceValue { get; set; }
 
         public decimal? regular_price { get; set; }
 
@@ -126,7 +126,7 @@ namespace WooCommerceNET.WooCommerce
         /// Product sale price.
         /// </summary>
         [DataMember(EmitDefaultValue = false, Name = "sale_price")]
-        private object sale_priceValue { get; set; }
+        protected object sale_priceValue { get; set; }
 
         public decimal? sale_price { get; set; }
 
@@ -180,7 +180,7 @@ namespace WooCommerceNET.WooCommerce
         /// read-only
         /// </summary>
         [DataMember(EmitDefaultValue = false, Name = "total_sales")]
-        private object total_salesValue { get; set; }
+        protected object total_salesValue { get; set; }
 
         public decimal? total_sales { get; set; }
 
@@ -240,9 +240,10 @@ namespace WooCommerceNET.WooCommerce
 
         /// <summary>
         /// Stock management at product level. Default is false.
+        /// When Manage stock is checked, string value "parent" will be given, otherwise, it will be bool value false.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public bool? manage_stock { get; set; }
+        public object manage_stock { get; set; }
 
         /// <summary>
         /// Stock quantity. If is a variable product this value will be used to control stock for all variations, unless you define stock at variation level.
@@ -286,7 +287,7 @@ namespace WooCommerceNET.WooCommerce
         /// Product weight in decimal format.
         /// </summary>
         [DataMember(EmitDefaultValue = false, Name = "weight")]
-        private object weightValue { get; set; }
+        protected object weightValue { get; set; }
 
         public decimal? weight { get; set; }
 
@@ -734,21 +735,21 @@ namespace WooCommerceNET.WooCommerce
         /// read-only
         /// </summary>
         [DataMember(EmitDefaultValue = false, Name = "price")]
-        private object priceValue { get; set; }
+        protected object priceValue { get; set; }
         public decimal? price { get; set; }
 
         /// <summary>
         /// Variation regular price.
         /// </summary>
         [DataMember(EmitDefaultValue = false, Name = "regular_price")]
-        private object regular_priceValue { get; set; }
+        protected object regular_priceValue { get; set; }
         public decimal? regular_price { get; set; }
 
         /// <summary>
         /// Variation sale price.
         /// </summary>
         [DataMember(EmitDefaultValue = false, Name = "sale_price")]
-        private object sale_priceValue { get; set; }
+        protected object sale_priceValue { get; set; }
         public decimal? sale_price { get; set; }
 
         /// <summary>
@@ -839,6 +840,7 @@ namespace WooCommerceNET.WooCommerce
 
         /// <summary>
         /// Stock management at variation level. Default is false.
+        /// When Manage stock is checked, string value "parent" will be given, otherwise, it will be bool value false.
         /// </summary>
         [DataMember(EmitDefaultValue = false, Name = "manage_stock")]
         private object manage_stockValue { get; set; }
@@ -886,7 +888,7 @@ namespace WooCommerceNET.WooCommerce
         /// Variation weight in decimal format.
         /// </summary>
         [DataMember(EmitDefaultValue = false, Name = "weight")]
-        private object weightValue { get; set; }
+        protected object weightValue { get; set; }
         public decimal? weight { get; set; }
 
         /// <summary>
