@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WooCommerce.NET</RootNamespace>
-    <AssemblyName>WooCommerce2.NET</AssemblyName>
+    <AssemblyName>WooCommerce.NET</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
