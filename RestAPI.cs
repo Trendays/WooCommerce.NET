@@ -151,14 +151,25 @@ namespace WooCommerceNET
                     Stream dataStream = await httpWebRequest.GetRequestStreamAsync().ConfigureAwait(false);
                     dataStream.Write(buffer, 0, buffer.Length);
                 }
-                
+
                 // asynchronously get a response
-                WebResponse wr = await httpWebRequest.GetResponseAsync().ConfigureAwait(false);
+                try
+                {
+                    WebResponse wr = await httpWebRequest.GetResponseAsync().ConfigureAwait(false);
+
+                    if (webResponseFilter != null)
+                        webResponseFilter.Invoke((HttpWebResponse)wr);
+
+                    return await GetStreamContent(wr.GetResponseStream(), wr.ContentType.Contains("=") ? wr.ContentType.Split('=')[1] : "UTF-8").ConfigureAwait(false);
+                } catch (WebException ex)
+                {
+                    var stream = ex.Response.GetResponseStream();
+                    var reader = new StreamReader(stream);
+                    var data = reader.ReadToEnd();
+                    throw ex;
+                }
 				
-                if (webResponseFilter != null)
-                    webResponseFilter.Invoke((HttpWebResponse)wr);
-				
-                return await GetStreamContent(wr.GetResponseStream(), wr.ContentType.Contains("=") ? wr.ContentType.Split('=')[1] : "UTF-8").ConfigureAwait(false);
+                
             }
             catch (WebException we)
             {
@@ -275,6 +286,7 @@ namespace WooCommerceNET
                     jsonString = "{\"" + typeof(T).Name.ToLower() + "\":" + jsonString + "}";
 
             stream.Dispose();
+
 
             if (jsonSeFilter != null)
                 jsonString = jsonSeFilter.Invoke(jsonString);
