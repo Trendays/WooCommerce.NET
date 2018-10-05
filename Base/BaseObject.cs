@@ -17,6 +17,7 @@ namespace WooCommerceNET.Base
             foreach (PropertyInfo pi in GetType().GetRuntimeProperties())
             {
                 PropertyInfo objValue = GetType().GetRuntimeProperties().FindByName(pi.Name + "Value");
+
                 if (objValue != null && pi.GetValue(this) != null)
                 {
                     if (pi.PropertyType == typeof(decimal?))

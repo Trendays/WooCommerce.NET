@@ -469,10 +469,12 @@ namespace WooCommerceNET.WooCommerce.v2
         [DataMember(EmitDefaultValue = false)]
         public string tax_class { get; set; }
 
+        [DataMember(EmitDefaultValue = false, Name = "subtotal")]
+        protected object subtotalValue { get; set; }
+
         /// <summary>
         /// Line subtotal (before discounts).
         /// </summary>
-        [DataMember(EmitDefaultValue = false)]
         public decimal? subtotal { get; set; }
 
         /// <summary>

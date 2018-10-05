@@ -409,7 +409,7 @@ namespace WooCommerceNET.WooCommerce.v1
         /// List of variations IDs.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public List<int> variations { get; set; }
+        public List<Variation> variations { get; set; }
 
         /// <summary>
         /// List of grouped products ID, only for group type products. 
@@ -842,15 +842,7 @@ namespace WooCommerceNET.WooCommerce.v1
         /// Stock management at variation level. Default is false.
         /// When Manage stock is checked, string value "parent" will be given, otherwise, it will be bool value false.
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "manage_stock")]
-        private object manage_stockValue { get; set; }
-        public bool? manage_stock
-        {
-            get
-            {
-                return manage_stockValue is string ? null : (bool?)manage_stockValue;
-            }
-        }
+        public bool manage_stock { get; set; }
 
         /// <summary>
         /// Stock quantity. If is a variable variation this value will be used to control stock for all variations, unless you define stock at variation level.
@@ -895,7 +887,7 @@ namespace WooCommerceNET.WooCommerce.v1
         /// Variation dimensions. See Dimensions properties.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public List<Dimension> dimensions { get; set; }
+        public Dimension dimensions { get; set; }
 
         /// <summary>
         /// Shipping class slug. Shipping classes are used by certain shipping methods to group similar products.
@@ -914,7 +906,7 @@ namespace WooCommerceNET.WooCommerce.v1
         /// Variation image data. See variation - Images properties.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public Image image { get; set; }
+        public List<Image> images { get; set; }
 
         /// <summary>
         /// List of variation attributes. See Variation Attributes properties
