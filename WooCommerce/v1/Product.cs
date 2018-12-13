@@ -907,7 +907,7 @@ namespace WooCommerceNET.WooCommerce.v1
         /// Variation image data. See variation - Images properties.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public List<Image> images { get; set; }
+        public List<Image> image { get; set; }
 
         /// <summary>
         /// List of variation attributes. See Variation Attributes properties
