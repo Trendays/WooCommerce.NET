@@ -243,6 +243,24 @@ namespace WooCommerceNET.WooCommerce.v1
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public List<CouponLine> coupon_lines { get; set; }
+
+        /// <summary>
+        /// Coupons line data. See Coupon Lines properties.
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public List<OrderRefundLine> refunds { get; set; }
+    }
+
+    public class OrderRefundLineItem
+    {
+        [DataMember(EmitDefaultValue = false)]
+        public int? id { get; set; }
+
+        [DataMember(EmitDefaultValue = false)]
+        public string reason { get; set; }
+
+        [DataMember(EmitDefaultValue = false)]
+        public decimal total { get; set; }
     }
 
     [DataContract]
