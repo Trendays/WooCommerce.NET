@@ -248,7 +248,7 @@ namespace WooCommerceNET.WooCommerce.v1
         /// Coupons line data. See Coupon Lines properties.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public List<OrderRefundLine> refunds { get; set; }
+        public List<OrderRefundLineItem> refunds { get; set; }
     }
 
     public class OrderRefundLineItem
