@@ -109,50 +109,32 @@ namespace WooCommerceNET.WooCommerce.v1
         /// Current product price. This is setted from regular_price and sale_price. 
         /// read-only
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "price")]
-        protected object priceValue { get; set; }
-
+        [DataMember(EmitDefaultValue = false)]
         public decimal? price { get; set; }
 
         /// <summary>
         /// Product regular price.
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "regular_price")]
-        protected object regular_priceValue { get; set; }
-
+        [DataMember(EmitDefaultValue = false)]
         public decimal? regular_price { get; set; }
 
         /// <summary>
         /// Product sale price.
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "sale_price")]
-        protected object sale_priceValue { get; set; }
-
+        [DataMember(EmitDefaultValue = false)]
         public decimal? sale_price { get; set; }
 
         /// <summary>
         /// Start date of sale price. Date in the YYYY-MM-DD format.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public string date_on_sale_from { get; set; }
-
-        /// <summary>
-        /// Start date of sale price, as GMT
-        /// </summary>
-        [DataMember(EmitDefaultValue = false)]
-        public string date_on_sale_from_gmt { get; set; }
+        public DateTime? date_on_sale_from { get; set; }
 
         /// <summary>
         /// Sets the sale end date. Date in the YYYY-MM-DD format.
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
-        public string date_on_sale_to { get; set; }
-
-        /// <summary>
-        /// End date of sale price, in the site’s timezone
-        /// </summary>
-        [DataMember(EmitDefaultValue = false)]
-        public string date_on_sale_to_gmt { get; set; }
+        public DateTime? date_on_sale_to { get; set; }
 
         /// <summary>
         /// Price formatted in HTML, e.g. delspan class=\"woocommerce-Price-amount amount\"span class=\"woocommerce-Price-currencySymbol\"#36;nbsp;3.00/span/span/del insspan class=\"woocommerce-Price-amount amount\"span class=\"woocommerce-Price-currencySymbol\"#36;nbsp;2.00/span/span/ins 
