@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -48,14 +50,7 @@
     <Compile Include="Base\SHA1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestAPI.cs" />
-    <Compile Include="WooCommerce\Legacy\Coupon.cs" />
-    <Compile Include="WooCommerce\Legacy\Customer.cs" />
-    <Compile Include="WooCommerce\Legacy\Order.cs" />
-    <Compile Include="WooCommerce\Legacy\Product.cs" />
-    <Compile Include="WooCommerce\Legacy\Store.cs" />
-    <Compile Include="WooCommerce\Legacy\Tax.cs" />
-    <Compile Include="WooCommerce\Legacy\WCObject.cs" />
-    <Compile Include="WooCommerce\Legacy\Webhook.cs" />
+    <Compile Include="WooCommerceException.cs" />
     <Compile Include="WooCommerce\v1\Address.cs" />
     <Compile Include="WooCommerce\v1\Coupon.cs" />
     <Compile Include="WooCommerce\v1\Customer.cs" />

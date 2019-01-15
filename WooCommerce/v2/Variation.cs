@@ -50,26 +50,23 @@ namespace WooCommerceNET.WooCommerce.v2
         [DataMember(EmitDefaultValue = false)]
         public string sku { get; set; }
 
-        [DataMember(EmitDefaultValue = false, Name = "price")]
-        protected object priceValue { get; set; }
         /// <summary>
         /// Current variation price. 
         /// read-only
         /// </summary>
+        [DataMember(EmitDefaultValue = false)]
         public decimal? price { get; set; }
 
-        [DataMember(EmitDefaultValue = false, Name = "regular_price")]
-        protected object regular_priceValue { get; set; }
         /// <summary>
         /// Variation regular price.
         /// </summary>
+        [DataMember(EmitDefaultValue = false)]
         public decimal? regular_price { get; set; }
 
-        [DataMember(EmitDefaultValue = false, Name = "sale_price")]
-        protected object sale_priceValue { get; set; }
         /// <summary>
         /// Variation sale price.
         /// </summary>
+        [DataMember(EmitDefaultValue = false)]
         public decimal? sale_price { get; set; }
 
         /// <summary>
@@ -165,11 +162,10 @@ namespace WooCommerceNET.WooCommerce.v2
         [DataMember(EmitDefaultValue = false)]
         public object manage_stock { get; set; }
 
-        [DataMember(EmitDefaultValue = false, Name = "stock_quantity")]
-        protected object stock_quantityValue { get; set; }
         /// <summary>
         /// Stock quantity.
         /// </summary>
+        [DataMember(EmitDefaultValue = false)]
         public int? stock_quantity { get; set; }
 
         /// <summary>
@@ -198,11 +194,10 @@ namespace WooCommerceNET.WooCommerce.v2
         [DataMember(EmitDefaultValue = false)]
         public bool? backordered { get; set; }
 
-        [DataMember(EmitDefaultValue = false, Name = "weight")]
-        protected object weightValue { get; set; }
         /// <summary>
         /// Variation weight (kg).
         /// </summary>
+        [DataMember(EmitDefaultValue = false)]
         public decimal? weight { get; set; }
 
         /// <summary>

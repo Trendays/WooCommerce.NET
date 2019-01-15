@@ -161,9 +161,7 @@ namespace WooCommerceNET.WooCommerce.v1
         /// Amount of sales. 
         /// read-only
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "total_sales")]
-        protected object total_salesValue { get; set; }
-
+        [DataMember(EmitDefaultValue = false)]
         public decimal? total_sales { get; set; }
 
         /// <summary>
@@ -268,9 +266,7 @@ namespace WooCommerceNET.WooCommerce.v1
         /// <summary>
         /// Product weight in decimal format.
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "weight")]
-        protected object weightValue { get; set; }
-
+        [DataMember(EmitDefaultValue = false)]
         public decimal? weight { get; set; }
 
         /// <summary>
@@ -716,22 +712,19 @@ namespace WooCommerceNET.WooCommerce.v1
         /// Current variation price. This is setted from regular_price and sale_price. 
         /// read-only
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "price")]
-        protected object priceValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? price { get; set; }
 
         /// <summary>
         /// Variation regular price.
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "regular_price")]
-        protected object regular_priceValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? regular_price { get; set; }
 
         /// <summary>
         /// Variation sale price.
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "sale_price")]
-        protected object sale_priceValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? sale_price { get; set; }
 
         /// <summary>
@@ -862,8 +855,7 @@ namespace WooCommerceNET.WooCommerce.v1
         /// <summary>
         /// Variation weight in decimal format.
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "weight")]
-        protected object weightValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? weight { get; set; }
 
         /// <summary>
