@@ -1,8 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
@@ -12,19 +17,71 @@ using WooCommerceNET.Base;
 
 namespace WooCommerceNET
 {
+    class DecimalConverter : JsonConverter
+    {
+        private static decimal Round(decimal x)
+        {
+            return Math.Round(x, 2);
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return (objectType == typeof(decimal) || objectType == typeof(decimal?));
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            var token = JToken.Load(reader);
+            bool isValueNull = token.Type == JTokenType.Null || (token.Type == JTokenType.String && string.IsNullOrEmpty(token.ToString()));
+
+            if (isValueNull)
+            {
+                if (objectType == typeof(decimal?))
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                if (token.Type == JTokenType.Float || token.Type == JTokenType.Integer)
+                {
+                    return Round(token.ToObject<decimal>());
+                }
+                else if (token.Type == JTokenType.String)
+                {
+                    return Round(decimal.Parse(token.ToString(), CultureInfo.InvariantCulture));
+                }
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            if (value != null)
+            {
+                decimal val = (decimal)value;
+                writer.WriteValue(val.ToString(CultureInfo.InvariantCulture));
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
+
     public class RestAPI
     {
-        private string wc_url = string.Empty;
-        private string wc_key = "";
-        private string wc_secret = "";
-        //private bool wc_Proxy = false;
+        private HttpClient httpClient;
+        private JsonSerializer jsonSerializer;
+        private string wc_url;
+        private string wc_key;
+        private string wc_secret;
+
 
         private bool AuthorizedHeader { get; set; }
 
-        private Func<string, string> jsonSeFilter;
-        private Func<string, string> jsonDeseFilter;
-        private Action<HttpWebRequest> webRequestFilter;
-        private Action<HttpWebResponse> webResponseFilter;
+
 
         /// <summary>
         /// Initialize the RestAPI object
@@ -33,20 +90,14 @@ namespace WooCommerceNET
         /// <param name="key">WooCommerce REST API Key</param>
         /// <param name="secret">WooCommerce REST API Secret</param>
         /// <param name="authorizedHeader">WHEN using HTTPS, do you prefer to send the Credentials in HTTP HEADER?</param>
-        /// <param name="jsonSerializeFilter">Provide a function to modify the json string after serilizing.</param>
-        /// <param name="jsonDeserializeFilter">Provide a function to modify the json string before deserilizing.</param>
-        /// <param name="requestFilter">Provide a function to modify the HttpWebRequest object.</param>
-        /// <param name="responseFilter">Provide a function to grab information from the HttpWebResponse object.</param>
-        public RestAPI(string url, string key, string secret, bool authorizedHeader = true, 
-                            Func<string, string> jsonSerializeFilter = null, 
-                            Func<string, string> jsonDeserializeFilter = null, 
-                            Action<HttpWebRequest> requestFilter = null,
-                            Action<HttpWebResponse> responseFilter = null)//, bool useProxy = false)
+        public RestAPI(string url, string key, string secret, bool authorizedHeader = true)
         {
             if (string.IsNullOrEmpty(url))
                 throw new Exception("Please use a valid WooCommerce Restful API url.");
 
-            string urlLower = url.Trim().ToLower().TrimEnd('/');
+            url = url.Trim().TrimEnd('/');
+
+            string urlLower = url.ToLower();
             if (urlLower.EndsWith("wc-api/v1") || urlLower.EndsWith("wc-api/v2") || urlLower.EndsWith("wc-api/v3"))
                 Version = APIVersion.Legacy;
             else if (urlLower.EndsWith("wp-json/wc/v1"))
@@ -60,26 +111,27 @@ namespace WooCommerceNET
                 Version = APIVersion.Unknown;
                 throw new Exception("Unknow WooCommerce Restful API version.");
             }
-            
-            wc_url = url + (url.EndsWith("/") ? "" : "/");
+
+            wc_url = url + "/";
             wc_key = key;
             AuthorizedHeader = authorizedHeader;
 
-            //Why extra '&'? look here: https://wordpress.org/support/topic/woocommerce-rest-api-v3-problem-woocommerce_api_authentication_error/
-            if ((url.ToLower().Contains("wc-api/v3") || !IsLegacy) && !wc_url.StartsWith("https", StringComparison.OrdinalIgnoreCase))
+            // Why extra '&'? look here: https://wordpress.org/support/topic/woocommerce-rest-api-v3-problem-woocommerce_api_authentication_error/
+            if ((urlLower.EndsWith("wc-api/v3") || !IsLegacy) && !wc_url.StartsWith("https", StringComparison.OrdinalIgnoreCase))
                 wc_secret = secret + "&";
             else
                 wc_secret = secret;
 
-            jsonSeFilter = jsonSerializeFilter;
-            jsonDeseFilter = jsonDeserializeFilter;
-            webRequestFilter = requestFilter;
-            webResponseFilter = responseFilter;
+            httpClient = new HttpClient(new HttpClientHandler
+            {
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+            });
 
-            //wc_Proxy = useProxy;
+            jsonSerializer = new JsonSerializer();
+            jsonSerializer.Converters.Add(new DecimalConverter());
         }
 
-        
+
 
         public bool IsLegacy
         {
@@ -102,119 +154,86 @@ namespace WooCommerceNET
         /// <param name="requestBody">If your call doesn't have a body, please pass string.Empty, not null.</param>
         /// <param name="parms"></param>
         /// <returns>json string</returns>
-        public async Task<string> SendHttpClientRequest<T>(string endpoint, RequestMethod method, T requestBody, Dictionary<string, string> parms = null)
+        public async Task<string> SendHttpClientRequest<T>(string endpoint, HttpMethod method, T requestBody, Dictionary<string, string> parms = null)
         {
-            HttpWebRequest httpWebRequest = null;
+            HttpRequestMessage httpRequest;
+
+            if (wc_url.StartsWith("https", StringComparison.OrdinalIgnoreCase))
+            {
+                if (AuthorizedHeader == true)
+                {
+                    httpRequest = new HttpRequestMessage(method, wc_url + GetOAuthEndPoint(method.ToString(), endpoint, parms));
+                    httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes(wc_key + ":" + wc_secret)));
+                }
+                else
+                {
+                    if (parms == null)
+                        parms = new Dictionary<string, string>();
+
+                    if (!parms.ContainsKey("consumer_key"))
+                        parms.Add("consumer_key", wc_key);
+                    if (!parms.ContainsKey("consumer_secret"))
+                        parms.Add("consumer_secret", wc_secret);
+
+                    httpRequest = new HttpRequestMessage(method, wc_url + GetOAuthEndPoint(method.ToString(), endpoint, parms));
+                }
+            }
+            else
+            {
+                httpRequest = new HttpRequestMessage(method, wc_url + GetOAuthEndPoint(method.ToString(), endpoint, parms));
+            }
+
+            if (requestBody != null)
+            {
+                string bodyString = requestBody as string;
+
+                if (!string.IsNullOrEmpty(bodyString))
+                {
+                    httpRequest.Content = new StringContent(bodyString, Encoding.UTF8, "application/json");
+                }
+                else if (bodyString is null)
+                {
+                    httpRequest.Content = new StringContent(SerializeJSon(requestBody), Encoding.UTF8, "application/json");
+                }
+            }
+
             try
             {
-                if (wc_url.StartsWith("https", StringComparison.OrdinalIgnoreCase))
+                HttpResponseMessage httpResponse = await httpClient.SendAsync(httpRequest);
+                string content = await httpResponse.Content.ReadAsStringAsync();
+                if (httpResponse.IsSuccessStatusCode)
                 {
-                    if (AuthorizedHeader == true)
-                    {
-                        httpWebRequest = (HttpWebRequest)WebRequest.Create(wc_url + GetOAuthEndPoint(method.ToString(), endpoint, parms));
-                        httpWebRequest.Headers["Authorization"] = "Basic " + Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes(wc_key + ":" + wc_secret));
-                    }
-                    else
-                    {
-                        if (parms == null)
-                            parms = new Dictionary<string, string>();
-
-                        if (!parms.ContainsKey("consumer_key"))
-                            parms.Add("consumer_key", wc_key);
-                        if (!parms.ContainsKey("consumer_secret"))
-                            parms.Add("consumer_secret", wc_secret);
-
-                        httpWebRequest = (HttpWebRequest)WebRequest.Create(wc_url + GetOAuthEndPoint(method.ToString(), endpoint, parms));
-                    }
+                    return content;
                 }
                 else
                 {
-                    httpWebRequest = (HttpWebRequest)WebRequest.Create(wc_url + GetOAuthEndPoint(method.ToString(), endpoint, parms));
+                    throw new WooCommerceException(httpResponse.StatusCode, content);
                 }
-
-                // start the stream immediately
-                httpWebRequest.Method = method.ToString();
-                httpWebRequest.AllowReadStreamBuffering = false;
-
-                if (webRequestFilter != null)
-                    webRequestFilter.Invoke(httpWebRequest);
-
-                //if (wc_Proxy)
-                //    httpWebRequest.Proxy.Credentials = CredentialCache.DefaultCredentials;
-                //else
-                //    httpWebRequest.Proxy = null;
-
-                if (requestBody.GetType() != typeof(string))
-                {
-                    httpWebRequest.ContentType = "application/json";
-                    var buffer = Encoding.UTF8.GetBytes(SerializeJSon(requestBody));
-                    Stream dataStream = await httpWebRequest.GetRequestStreamAsync().ConfigureAwait(false);
-                    dataStream.Write(buffer, 0, buffer.Length);
-                }
-                else
-                {
-                    if(requestBody.ToString() != string.Empty)
-                    {
-                        httpWebRequest.ContentType = "application/json";
-                        var buffer = Encoding.UTF8.GetBytes(requestBody.ToString());
-                        Stream dataStream = await httpWebRequest.GetRequestStreamAsync().ConfigureAwait(false);
-                        dataStream.Write(buffer, 0, buffer.Length);
-                    }
-                }
-                
-                // asynchronously get a response
-                try
-                {
-                    WebResponse wr = await httpWebRequest.GetResponseAsync().ConfigureAwait(false);
-
-                    if (webResponseFilter != null)
-                        webResponseFilter.Invoke((HttpWebResponse)wr);
-
-                    return await GetStreamContent(wr.GetResponseStream(), wr.ContentType.Contains("=") ? wr.ContentType.Split('=')[1] : "UTF-8").ConfigureAwait(false);
-                } catch (WebException ex)
-                {
-                    var stream = ex.Response.GetResponseStream();
-                    var reader = new StreamReader(stream);
-                    var data = reader.ReadToEnd();
-                    throw ex;
-                }
-				
-                
             }
-            catch (WebException we)
+            catch (HttpRequestException ex)
             {
-                if (httpWebRequest != null && httpWebRequest.HaveResponse)
-                    if (we.Response != null)
-                        throw new WebException(await GetStreamContent(we.Response.GetResponseStream(), we.Response.ContentType.Contains("=") ? we.Response.ContentType.Split('=')[1] : "UTF-8").ConfigureAwait(false), we.InnerException, we.Status, we.Response);
-                    else
-                        throw we;
-                else
-                    throw we;
-            }
-            catch (Exception e)
-            {
-                return e.Message;
+                throw ex;
             }
         }
 
         public async Task<string> GetRestful(string endpoint, Dictionary<string, string> parms = null)
         {
-            return await SendHttpClientRequest(endpoint, RequestMethod.GET, string.Empty, parms).ConfigureAwait(false);
+            return await SendHttpClientRequest(endpoint, HttpMethod.Get, string.Empty, parms).ConfigureAwait(false);
         }
 
         public async Task<string> PostRestful(string endpoint, object jsonObject, Dictionary<string, string> parms = null)
         {
-            return await SendHttpClientRequest(endpoint, RequestMethod.POST, jsonObject, parms).ConfigureAwait(false);
+            return await SendHttpClientRequest(endpoint, HttpMethod.Post, jsonObject, parms).ConfigureAwait(false);
         }
 
         public async Task<string> PutRestful(string endpoint, object jsonObject, Dictionary<string, string> parms = null)
         {
-            return await SendHttpClientRequest(endpoint, RequestMethod.PUT, jsonObject, parms).ConfigureAwait(false);
+            return await SendHttpClientRequest(endpoint, HttpMethod.Put, jsonObject, parms).ConfigureAwait(false);
         }
 
         public async Task<string> DeleteRestful(string endpoint, Dictionary<string, string> parms = null)
         {
-            return await SendHttpClientRequest(endpoint, RequestMethod.DELETE, string.Empty, parms).ConfigureAwait(false);
+            return await SendHttpClientRequest(endpoint, HttpMethod.Delete, string.Empty, parms).ConfigureAwait(false);
         }
 
         private string GetOAuthEndPoint(string method, string endpoint, Dictionary<string, string> parms = null)
@@ -259,73 +278,18 @@ namespace WooCommerceNET
 
             return endpoint + "?" + parmstr.TrimEnd('&');
         }
-        
-        private async Task<string> GetStreamContent(Stream s, string charset)
-        {
-            StringBuilder sb = new StringBuilder();
-            byte[] Buffer = new byte[512];
-            int count = 0;
-            count = await s.ReadAsync(Buffer, 0, Buffer.Length).ConfigureAwait(false);
-            while (count > 0)
-            {
-                sb.Append(Encoding.GetEncoding(charset).GetString(Buffer, 0, count));
-                count = await s.ReadAsync(Buffer, 0, Buffer.Length).ConfigureAwait(false);
-            }
-
-            return sb.ToString();
-        }
 
         public virtual string SerializeJSon<T>(T t)
         {
-            DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings()
-            {
-                DateTimeFormat = new DateTimeFormat(DateTimeFormat),
-                UseSimpleDictionaryFormat = true
-            };
-
-            MemoryStream stream = new MemoryStream();
-            DataContractJsonSerializer ds = new DataContractJsonSerializer(t.GetType(), settings);
-            ds.WriteObject(stream, t);
-            byte[] data = stream.ToArray();
-            string jsonString = Encoding.UTF8.GetString(data, 0, data.Length);
-
-            if (IsLegacy)
-                if (typeof(T).IsArray)
-                    jsonString = "{\"" + typeof(T).Name.ToLower().Replace("[]", "s") + "\":" + jsonString + "}";
-                else
-                    jsonString = "{\"" + typeof(T).Name.ToLower() + "\":" + jsonString + "}";
-
-            stream.Dispose();
-
-
-            if (jsonSeFilter != null)
-                jsonString = jsonSeFilter.Invoke(jsonString);
-
-            return jsonString;
+            var buffer = new StringWriter();
+            jsonSerializer.Serialize(buffer, t);
+            return buffer.ToString();
         }
 
         public virtual T DeserializeJSon<T>(string jsonString)
         {
-            if (jsonDeseFilter != null)
-                jsonString = jsonDeseFilter.Invoke(jsonString);
-
-            Type dT = typeof(T);
-            
-            if (dT.Name.EndsWith("List"))
-                dT = dT.GetTypeInfo().DeclaredProperties.First().PropertyType.GenericTypeArguments[0];
-
-            DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings()
-            {
-                DateTimeFormat = new DateTimeFormat(DateTimeFormat),
-                UseSimpleDictionaryFormat = true
-            };
-
-            DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T), settings);
-            MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonString));
-            T obj = (T)ser.ReadObject(stream);
-            stream.Dispose();
-
-            return obj;
+            JsonTextReader reader = new JsonTextReader(new StringReader(jsonString));
+            return jsonSerializer.Deserialize<T>(reader);
         }
 
         public string DateTimeFormat
@@ -335,16 +299,6 @@ namespace WooCommerceNET
                 return IsLegacy ? "yyyy-MM-ddTHH:mm:ssZ" : "yyyy-MM-ddTHH:mm:ss";
             }
         }
-    }
-
-    public enum RequestMethod
-    {
-        HEAD = 1,
-        GET = 2,
-        POST = 3,
-        PUT = 4,
-        PATCH = 5,
-        DELETE = 6
     }
 
     public enum APIVersion
