@@ -74,14 +74,12 @@ namespace WooCommerceNET
     {
         private HttpClient httpClient;
         private JsonSerializer jsonSerializer;
-        private string wc_url;
-        private string wc_key;
-        private string wc_secret;
 
-
-        private bool AuthorizedHeader { get; set; }
-
-
+        public APIVersion Version { get; private set; }
+        public string BaseUrl { get; private set; }
+        public string ClientKey { get; private set; }
+        public string ClientSecret { get; private set; }
+        public bool AuthorizedHeader { get; private set; }
 
         /// <summary>
         /// Initialize the RestAPI object
@@ -98,9 +96,7 @@ namespace WooCommerceNET
             url = url.Trim().TrimEnd('/');
 
             string urlLower = url.ToLower();
-            if (urlLower.EndsWith("wc-api/v1") || urlLower.EndsWith("wc-api/v2") || urlLower.EndsWith("wc-api/v3"))
-                Version = APIVersion.Legacy;
-            else if (urlLower.EndsWith("wp-json/wc/v1"))
+            if (urlLower.EndsWith("wp-json/wc/v1"))
                 Version = APIVersion.Version1;
             else if (urlLower.EndsWith("wp-json/wc/v2"))
                 Version = APIVersion.Version2;
@@ -108,19 +104,22 @@ namespace WooCommerceNET
                 Version = APIVersion.ThirdPartyPlugins;
             else
             {
-                Version = APIVersion.Unknown;
                 throw new Exception("Unknow WooCommerce Restful API version.");
             }
 
-            wc_url = url + "/";
-            wc_key = key;
+            BaseUrl = url + "/";
+            ClientKey = key;
             AuthorizedHeader = authorizedHeader;
 
             // Why extra '&'? look here: https://wordpress.org/support/topic/woocommerce-rest-api-v3-problem-woocommerce_api_authentication_error/
-            if ((urlLower.EndsWith("wc-api/v3") || !IsLegacy) && !wc_url.StartsWith("https", StringComparison.OrdinalIgnoreCase))
-                wc_secret = secret + "&";
+            if (!BaseUrl.StartsWith("https", StringComparison.OrdinalIgnoreCase))
+            {
+                ClientSecret = secret + "&";
+            }
             else
-                wc_secret = secret;
+            {
+                ClientSecret = secret;
+            }
 
             httpClient = new HttpClient(new HttpClientHandler
             {
@@ -130,20 +129,6 @@ namespace WooCommerceNET
             jsonSerializer = new JsonSerializer();
             jsonSerializer.Converters.Add(new DecimalConverter());
         }
-
-
-
-        public bool IsLegacy
-        {
-            get
-            {
-                return Version == APIVersion.Legacy;
-            }
-        }
-
-        public APIVersion Version { get; private set; }
-
-        public string Url { get { return wc_url; } }
 
         /// <summary>
         /// Make Restful calls
@@ -158,29 +143,36 @@ namespace WooCommerceNET
         {
             HttpRequestMessage httpRequest;
 
-            if (wc_url.StartsWith("https", StringComparison.OrdinalIgnoreCase))
+            if (BaseUrl.StartsWith("https", StringComparison.OrdinalIgnoreCase))
             {
                 if (AuthorizedHeader == true)
                 {
-                    httpRequest = new HttpRequestMessage(method, wc_url + GetOAuthEndPoint(method.ToString(), endpoint, parms));
-                    httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes(wc_key + ":" + wc_secret)));
+                    httpRequest = new HttpRequestMessage(method, BaseUrl + GetOAuthEndPoint(method.ToString(), endpoint, parms));
+                    httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes($"{ClientKey}:{ClientSecret}")));
                 }
                 else
                 {
                     if (parms == null)
+                    {
                         parms = new Dictionary<string, string>();
+                    }
 
                     if (!parms.ContainsKey("consumer_key"))
-                        parms.Add("consumer_key", wc_key);
-                    if (!parms.ContainsKey("consumer_secret"))
-                        parms.Add("consumer_secret", wc_secret);
+                    {
+                        parms.Add("consumer_key", ClientKey);
+                    }
 
-                    httpRequest = new HttpRequestMessage(method, wc_url + GetOAuthEndPoint(method.ToString(), endpoint, parms));
+                    if (!parms.ContainsKey("consumer_secret"))
+                    {
+                        parms.Add("consumer_secret", ClientSecret);
+                    }
+
+                    httpRequest = new HttpRequestMessage(method, BaseUrl + GetOAuthEndPoint(method.ToString(), endpoint, parms));
                 }
             }
             else
             {
-                httpRequest = new HttpRequestMessage(method, wc_url + GetOAuthEndPoint(method.ToString(), endpoint, parms));
+                httpRequest = new HttpRequestMessage(method, BaseUrl + GetOAuthEndPoint(method.ToString(), endpoint, parms));
             }
 
             if (requestBody != null)
@@ -238,45 +230,50 @@ namespace WooCommerceNET
 
         private string GetOAuthEndPoint(string method, string endpoint, Dictionary<string, string> parms = null)
         {
-            if (wc_url.StartsWith("https", StringComparison.OrdinalIgnoreCase))
+            // OAuth 1.0 spec: https://tools.ietf.org/html/rfc5849#section-3.1
+
+            if (BaseUrl.StartsWith("https", StringComparison.OrdinalIgnoreCase))
             {
                 if (parms == null)
+                {
                     return endpoint;
+                }
                 else
                 {
-                    string requestParms = string.Empty;
-                    foreach (var parm in parms)
-                        requestParms += parm.Key + "=" + parm.Value + "&";
-
-                    return endpoint + "?" + requestParms.TrimEnd('&');
+                    return $"{endpoint}?{BuildQueryString(parms)}";
                 }
             }
 
             Dictionary<string, string> dic = new Dictionary<string, string>();
-            dic.Add("oauth_consumer_key", wc_key);
+            dic.Add("oauth_consumer_key", ClientKey);
             dic.Add("oauth_nonce", Guid.NewGuid().ToString("N"));
             dic.Add("oauth_signature_method", "HMAC-SHA256");
             dic.Add("oauth_timestamp", Common.GetUnixTime(false));
 
             if (parms != null)
+            {
                 foreach (var p in parms)
+                {
                     dic.Add(p.Key, p.Value);
+                }
+            }
 
-            string base_request_uri = method.ToUpper() + "&" + Uri.EscapeDataString(wc_url + endpoint) + "&";
-            string stringToSign = string.Empty;
+            string stringToSign = BuildQueryString(dic.OrderBy(x => x.Key));
+            string oauthUri = $"{method.ToUpper()}&{EscapeComponent(BaseUrl + endpoint)}&{EscapeComponent(stringToSign)}";
 
-            foreach (var parm in dic.OrderBy(x => x.Key))
-                stringToSign += Uri.EscapeDataString(parm.Key) + "=" + Uri.EscapeDataString(parm.Value) + "&";
+            dic.Add("oauth_signature", Common.GetSHA256(ClientSecret, oauthUri));
 
-            base_request_uri = base_request_uri + Uri.EscapeDataString(stringToSign.TrimEnd('&'));
+            return $"{endpoint}?{BuildQueryString(dic)}";
+        }
 
-            dic.Add("oauth_signature", Common.GetSHA256(wc_secret, base_request_uri));
+        private string EscapeComponent(string val)
+        {
+            return Uri.EscapeDataString(val);
+        }
 
-            string parmstr = string.Empty;
-            foreach (var parm in dic)
-                parmstr += parm.Key + "=" + Uri.EscapeDataString(parm.Value) + "&";
-
-            return endpoint + "?" + parmstr.TrimEnd('&');
+        private string BuildQueryString(IEnumerable<KeyValuePair<string, string>> parms)
+        {
+            return string.Join("&", parms.Select(p => $"{EscapeComponent(p.Key)}={EscapeComponent(p.Value)}"));
         }
 
         public virtual string SerializeJSon<T>(T t)
@@ -291,20 +288,10 @@ namespace WooCommerceNET
             JsonTextReader reader = new JsonTextReader(new StringReader(jsonString));
             return jsonSerializer.Deserialize<T>(reader);
         }
-
-        public string DateTimeFormat
-        {
-            get
-            {
-                return IsLegacy ? "yyyy-MM-ddTHH:mm:ssZ" : "yyyy-MM-ddTHH:mm:ss";
-            }
-        }
     }
 
     public enum APIVersion
     {
-        Unknown = 0,
-        Legacy = 1,
         Version1 = 2,
         Version2 = 3,
         ThirdPartyPlugins = 99
