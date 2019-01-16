@@ -107,27 +107,25 @@ namespace WooCommerceNET.WooCommerce.v2
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public string sku { get; set; }
-        
-        [DataMember(EmitDefaultValue = false, Name = "price")]
-        protected object priceValue { get; set; }
+
+
         /// <summary>
         /// Current product price. 
         /// read-only
         /// </summary>
+        /// [DataMember(EmitDefaultValue = false)]
         public decimal? price { get; set; }
-        
-        [DataMember(EmitDefaultValue = false, Name = "regular_price")]
-        protected object regular_priceValue { get; set; }
+
         /// <summary>
         /// Product regular price.
         /// </summary>
+        [DataMember(EmitDefaultValue = false)]
         public decimal? regular_price { get; set; }
-        
-        [DataMember(EmitDefaultValue = false, Name = "sale_price")]
-        protected object sale_priceValue { get; set; }
+
         /// <summary>
         /// Product sale price.
         /// </summary>
+        [DataMember(EmitDefaultValue = false)]
         public decimal? sale_price { get; set; }
 
         /// <summary>
@@ -242,11 +240,10 @@ namespace WooCommerceNET.WooCommerce.v2
         [DataMember(EmitDefaultValue = false)]
         public bool? manage_stock { get; set; }
 
-        [DataMember(EmitDefaultValue = false, Name = "stock_quantity")]
-        protected object stock_quantityValue { get; set; }
         /// <summary>
         /// Stock quantity.
         /// </summary>
+        [DataMember(EmitDefaultValue = false)]
         public int? stock_quantity { get; set; }
 
         /// <summary>
@@ -281,11 +278,10 @@ namespace WooCommerceNET.WooCommerce.v2
         [DataMember(EmitDefaultValue = false)]
         public bool? sold_individually { get; set; }
 
-        [DataMember(EmitDefaultValue = false, Name = "weight")]
-        protected object weightValue { get; set; }
         /// <summary>
         /// Product weight (kg).
         /// </summary>
+        [DataMember(EmitDefaultValue = false)]
         public decimal? weight { get; set; }
 
         /// <summary>

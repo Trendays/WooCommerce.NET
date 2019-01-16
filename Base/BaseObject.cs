@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
@@ -11,105 +9,7 @@ namespace WooCommerceNET.Base
     [DataContract]
     public class JsonObject
     {
-        [OnSerializing]
-        void OnSerializing(StreamingContext ctx)
-        {
-            foreach (PropertyInfo pi in GetType().GetRuntimeProperties())
-            {
-                PropertyInfo objValue = GetType().GetRuntimeProperties().FindByName(pi.Name + "Value");
-
-                if (objValue != null && pi.GetValue(this) != null)
-                {
-                    if (pi.PropertyType == typeof(decimal?))
-                    {
-                        if (GetType().FullName.StartsWith("WooCommerceNET.WooCommerce.v1") ||
-                            GetType().FullName.StartsWith("WooCommerceNET.WooCommerce.v2") ||
-                            GetType().GetTypeInfo().BaseType.FullName.StartsWith("WooCommerceNET.WooCommerce.v1") ||
-                            GetType().GetTypeInfo().BaseType.FullName.StartsWith("WooCommerceNET.WooCommerce.v2"))
-                            objValue.SetValue(this, (pi.GetValue(this) as decimal?).Value.ToString(CultureInfo.InvariantCulture));
-                        else
-                            objValue.SetValue(this, decimal.Parse(pi.GetValue(this).ToString(), CultureInfo.InvariantCulture));
-                    }
-                    else if (pi.PropertyType == typeof(int?))
-                    {
-                        objValue.SetValue(this, int.Parse(pi.GetValue(this).ToString(), CultureInfo.InvariantCulture));
-                    }
-                    else if (pi.PropertyType == typeof(DateTime?))
-                    {
-                        objValue.SetValue(this, ((DateTime?)pi.GetValue(this)).Value.ToString("yyyy-MM-ddTHH:mm:ss"));
-                    }
-                }
-            }
-        }
-
-        [OnDeserialized]
-        void OnDeserialized(StreamingContext ctx)
-        {
-            foreach (PropertyInfo pi in GetType().GetRuntimeProperties())
-            {
-                PropertyInfo objValue = GetType().GetRuntimeProperties().FindByName(pi.Name + "Value");
-
-                if (objValue != null)
-                {
-                    if (pi.PropertyType == typeof(decimal?))
-                    {
-                        object value = objValue.GetValue(this);
-
-                        if (!(value == null || value.ToString() == string.Empty))
-                            pi.SetValue(this, decimal.Parse(value.ToString(), CultureInfo.InvariantCulture));
-                    }
-                    else if (pi.PropertyType == typeof(int?))
-                    {
-                        object value = objValue.GetValue(this);
-
-                        if (!(value == null || value.ToString() == string.Empty))
-                            pi.SetValue(this, int.Parse(value.ToString(), CultureInfo.InvariantCulture));
-                    }
-                    else if (pi.PropertyType == typeof(DateTime?))
-                    {
-                        object value = objValue.GetValue(this);
-
-                        if (!(value == null || value.ToString() == string.Empty))
-                            pi.SetValue(this, DateTime.Parse(value.ToString()));
-                    }
-                }
-            }
-        }
-
-
-        //[OnDeserializing]
-        //void tset(StreamingContext ctx)
-        //{
-        //    if (GetType().Name.Contains("ProductMeta"))
-        //        foreach (PropertyInfo pi in GetType().GetRuntimeProperties())
-        //        {
-
-        //        }
-        //}
     }
-
-    //public class MyCustomerResolver : DataContractResolver
-    //{
-    //    public override bool TryResolveType(Type dataContractType, Type declaredType, DataContractResolver knownTypeResolver, out XmlDictionaryString typeName, out XmlDictionaryString typeNamespace)
-    //    {
-    //        if (dataContractType == typeof(string))
-    //        {
-    //            XmlDictionary dictionary = new XmlDictionary();
-    //            typeName = dictionary.Add("SomeCustomer");
-    //            typeNamespace = dictionary.Add("http://tempuri.com");
-    //            return true;
-    //        }
-    //        else
-    //        {
-    //            return knownTypeResolver.TryResolveType(dataContractType, declaredType, null, out typeName, out typeNamespace);
-    //        }
-    //    }
-
-    //    public override Type ResolveName(string typeName, string typeNamespace, Type declaredType, DataContractResolver knownTypeResolver)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
 
     public class BatchObject<T>
     {

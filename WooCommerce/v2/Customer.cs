@@ -112,12 +112,11 @@ namespace WooCommerceNET.WooCommerce.v2
         [DataMember(EmitDefaultValue = false)]
         public int? orders_count { get; set; }
 
-        [DataMember(EmitDefaultValue = false, Name = "total_spent")]
-        protected object total_spentValue { get; set; }
         /// <summary>
         /// Total amount spent. 
         /// read-only
         /// </summary>
+        [DataMember(EmitDefaultValue = false)]
         public decimal? total_spent { get; set; }
 
         /// <summary>

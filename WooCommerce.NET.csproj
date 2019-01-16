@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,8 +29,12 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -48,14 +53,7 @@
     <Compile Include="Base\SHA1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RestAPI.cs" />
-    <Compile Include="WooCommerce\Legacy\Coupon.cs" />
-    <Compile Include="WooCommerce\Legacy\Customer.cs" />
-    <Compile Include="WooCommerce\Legacy\Order.cs" />
-    <Compile Include="WooCommerce\Legacy\Product.cs" />
-    <Compile Include="WooCommerce\Legacy\Store.cs" />
-    <Compile Include="WooCommerce\Legacy\Tax.cs" />
-    <Compile Include="WooCommerce\Legacy\WCObject.cs" />
-    <Compile Include="WooCommerce\Legacy\Webhook.cs" />
+    <Compile Include="WooCommerceException.cs" />
     <Compile Include="WooCommerce\v1\Address.cs" />
     <Compile Include="WooCommerce\v1\Coupon.cs" />
     <Compile Include="WooCommerce\v1\Customer.cs" />
@@ -86,6 +84,9 @@
     <Compile Include="WooCommerce\v2\Variation.cs" />
     <Compile Include="WooCommerce\v2\WCObject.cs" />
     <Compile Include="WooCommerce\v2\Webhook.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

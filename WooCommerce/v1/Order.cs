@@ -201,9 +201,7 @@ namespace WooCommerceNET.WooCommerce.v1
         /// The date the order has been paid, in the site’s timezone. 
         /// read-only
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "date_paid")]
-        protected object date_paidValue { get; set; }
-
+        [DataMember(EmitDefaultValue = false)]
         public DateTime? date_paid { get; set; }
 
         /// <summary>
@@ -392,15 +390,13 @@ namespace WooCommerceNET.WooCommerce.v1
         /// <summary>
         /// tax item total
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "total")]
-        protected object totalValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? total { get; set; }
 
         /// <summary>
         /// tax item subtotal
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "subtotal")]
-        protected object subtotalValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? subtotal { get; set; }
     }
 
@@ -430,16 +426,14 @@ namespace WooCommerceNET.WooCommerce.v1
         /// <summary>
         /// Line total (after discounts).
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "total")]
-        protected object totalValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? total { get; set; }
 
         /// <summary>
         /// Line total tax (after discounts). 
         /// read-only
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "total_tax")]
-        protected object total_taxValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? total_tax { get; set; }
 
         /// <summary>
@@ -491,16 +485,14 @@ namespace WooCommerceNET.WooCommerce.v1
         /// Tax total (not including shipping taxes). 
         /// read-only
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "tax_total")]
-        protected object tax_totalValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? tax_total { get; set; }
 
         /// <summary>
         /// Shipping tax total. 
         /// read-only
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "shipping_tax_total")]
-        protected object shipping_tax_totalValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? shipping_tax_total { get; set; }
     }
 
@@ -537,15 +529,13 @@ namespace WooCommerceNET.WooCommerce.v1
         /// <summary>
         /// Line total (after discounts).
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "total")]
-        protected object totalValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? total { get; set; }
 
         /// <summary>
         /// Line total tax (after discounts).
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "total_tax")]
-        protected object total_taxValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? total_tax { get; set; }
 
         /// <summary>
@@ -577,16 +567,14 @@ namespace WooCommerceNET.WooCommerce.v1
         /// Discount total. 
         /// required
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "discount")]
-        protected object discountValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? discount { get; set; }
 
         /// <summary>
         /// Discount total tax. 
         /// read-only
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "discount_tax")]
-        protected object discount_taxValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? discount_tax { get; set; }
     }
 
@@ -642,8 +630,7 @@ namespace WooCommerceNET.WooCommerce.v1
         /// Refund amount. 
         /// required
         /// </summary>
-        [DataMember(EmitDefaultValue = false, Name = "amount")]
-        protected object amountValue { get; set; }
+        [DataMember(EmitDefaultValue = false)]
         public decimal? amount { get; set; }
 
         /// <summary>
