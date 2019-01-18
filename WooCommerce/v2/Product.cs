@@ -108,12 +108,11 @@ namespace WooCommerceNET.WooCommerce.v2
         [DataMember(EmitDefaultValue = false)]
         public string sku { get; set; }
 
-
         /// <summary>
         /// Current product price. 
         /// read-only
         /// </summary>
-        /// [DataMember(EmitDefaultValue = false)]
+        [DataMember(EmitDefaultValue = false)]
         public decimal? price { get; set; }
 
         /// <summary>
